@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
 	next();
 });
 
-const Port = process.env.PORT || 3002;
+const Port = process.env.PORT || 3000;
 
 //Router
 app.use("/", require("./route/route"));

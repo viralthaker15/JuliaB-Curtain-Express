@@ -9,6 +9,7 @@ const request = require("request-promise");
 //const forwardingAddress = process.env.APP_URL;
 const forwardingAddress = "https://juliab-curtain-express.herokuapp.com";
 const jwt = require("jsonwebtoken");
+const Port = process.env.PORT || 3000;
 exports.getInstall = function (req, res) {
 	// const shop = req.query.shop;
 	const shop = "shah-nidhi.myshopify.com";
@@ -17,10 +18,10 @@ exports.getInstall = function (req, res) {
 	// 	createJWT(res, shop);
 	// 	return;
 	// }
-	//   if (process.env.PORT) {
-	//     createJWT(res, shop);
-	//     return;
-	//   }
+	// if (process.env.PORT) {
+	// 	createJWT(res, shop);
+	// 	return;
+	// }
 	/* End of dummy code */
 	if (shop) {
 		const state = nonce();
@@ -47,10 +48,10 @@ exports.getInstall = function (req, res) {
 	}
 };
 
-// const createJWT = (res, shop) => {
-// 	var token = jwt.sign({ user: shop }, "test@123", { expiresIn: "15m" });
-// 	res.redirect(`${process.env.CLIENT_URL}/?token=${token}`);
-// };
+const createJWT = (res, shop, payload) => {
+	var token = jwt.sign({ user: shop }, "test@123", { expiresIn: "15m" });
+	res.send({ token, data: payload });
+};
 
 exports.getCallback = function (req, res) {
 	const { shop, hmac, code, state } = req.query;
@@ -114,13 +115,12 @@ exports.getCallback = function (req, res) {
 				request
 					.get(shopRequestUrl, { headers: shopRequestHeaders })
 					.then(shopResponse => {
-						//createJWT(res, shop);
-						res.end(shopResponse);
+						createJWT(res, shop, shopResponse);
+						//res.end(shopResponse);
 					}) // not generating token
 					.catch(error => {
-						res
-							.status(error.statusCode)
-							.send(error.error.error_description + "*");
+						console.log(error);
+						res.status(400).send(error.error_description);
 					});
 				// TODO
 				// Use access token to make API call to 'shop' endpoint
